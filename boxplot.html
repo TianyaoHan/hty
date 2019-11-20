@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>boxplot</title>
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			
+			const CircleSize = 10;
+			var svg = d3.select('svg');
+			var threshold;
+			var data = [];
+
+			const drawcircle = (x,y,size) =>{
+				svg.append('circle')
+				.attr('class','click-circle')
+				.attr('cx',x)
+				.attr('cy',y)
+				.attr('r',size);
+				data.push(y);
+			}
+
+			const deletecircle = () =>{
+				svg.selectAll('circle')
+				   .on('click',function(){
+				   		node = d3.select(this);
+				   		cy = node.attr('cy');
+				    	data = jQuery.grep(data, function(value) {
+								return value != cy;
+							});
+				   		node.remove();
+				   		$('#data').html(parsedata(data));
+
+				   });
+			}
+
+			const parsedata = data =>{
+				return data.toString().split(",").join(", ");
+			}
+
+			svg.on('click',function(){		
+				var corrds = d3.mouse(this);
+				drawcircle(corrds[0],corrds[1],CircleSize);
+				$('#data').html(parsedata(data));
+			});
+
+
+			d3.selectAll('input').on('click',function(){
+				
+			 	threshold = d3.select(this).node().value;
+				
+			 	if(threshold=='remove'){
+			 		
+			 		svg.on('click',function(){
+			 			deletecircle();
+			 		});					
+			 	}
+			 	
+			 	else{
+
+					svg.on('click',function(){		
+						var corrds = d3.mouse(this);
+						drawcircle(corrds[0],corrds[1],CircleSize);
+					});			 	
+				}					
+			});
+
+		});
+
+	</script>
+	<style type="text/css">
+		
+		.plot{
+			background-color: #dfe5e8;
+			width: 500px;
+			height: 500px;
+		}
+		
+		.click-circle{
+			fill: steelblue;
+		}
+
+		.data{
+			font-size: 20px;
+		}
+
+
+	</style>
+</head>
+<body>
+	
+	<p>
+	<input type="radio" name="filterPreset" value="add" checked="true"> add
+	<input type="radio" name="filterPreset" value="remove"> remove
+	</p>
+
+	<svg class='plot'></svg>
+
+	<div class="main" id="data"></div>
+</body>
+</html>
